@@ -1,0 +1,34 @@
+name: Build
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build
+    runs-on: windows-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v2
+        with:
+          msbuild-architecture: x64
+    
+      - name: MSBuild
+        run: |
+          nuget restore
+          MSBuild .\WinFormsApp1.sln /p:Configuration=Debug /p:Platform="Any CPU"
+          
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: CCC25-Test02
+          path: |
+            WinFormsApp1\bin\Debug\net8.0-windows\WinFormsApp1.exe
+            WinFormsApp1\bin\Debug\net8.0-windows\WinFormsApp1.dll
+            WinFormsApp1\bin\Debug\net8.0-windows\WinFormsApp1.runtimeconfig.json
+          if-no-files-found: error
